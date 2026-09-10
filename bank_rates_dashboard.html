@@ -9,4 +9,41 @@
 <section class="panel"><h2>기관별 금리 비교</h2><p class="legend"><i class="base"></i>기본금리 &nbsp; <i class="max"></i>최고우대금리</p><div class="charts"><div class="chart"><div class="bank">OK저축은행<small>저축은행</small></div><div class="bars"><div class="track"><div class="bar base" style="width:80%"></div><b>4.00%</b></div><div class="track"><div class="bar max" style="width:80%"></div><b>4.00%</b></div></div></div><div class="chart"><div class="bank">SBI저축은행<small>저축은행</small></div><div class="bars"><div class="track"><div class="bar base" style="width:74%"></div><b>3.70%</b></div><div class="track"><div class="bar max" style="width:78%"></div><b>3.90%</b></div></div></div><div class="chart"><div class="bank">신협(수지신협)<small>상호금융</small></div><div class="bars"><div class="track"><div class="bar base" style="width:74%"></div><b>3.70%</b></div><div class="track"><div class="bar max" style="width:74%"></div><b>3.70%</b></div></div></div><div class="chart"><div class="bank">KB국민은행<small>시중은행</small></div><div class="bars"><div class="track"><div class="bar base" style="width:48%"></div><b>2.40%</b></div><div class="track"><div class="bar max" style="width:64%"></div><b>3.20%</b></div></div></div><div class="chart"><div class="bank">수협(대포수협)<small>상호금융</small></div><div class="bars"><div class="track"><div class="bar base" style="width:60%"></div><b>3.00%</b></div><div class="track"><div class="bar max" style="width:60%"></div><b>3.00%</b></div></div></div><div class="chart"><div class="bank">신한은행<small>시중은행</small></div><div class="bars"><div class="track"><div class="bar base" style="width:51%"></div><b>2.55%</b></div><div class="track"><div class="bar max" style="width:51%"></div><b>2.55%</b></div></div></div></div><p class="note">모든 막대는 0~5%의 동일 척도입니다. 최고우대금리는 우대를 포함한 총금리입니다.</p></section>
 <section class="panel"><h2>전체 상품 목록</h2><div class="scroll" role="region" aria-label="금리 비교표" tabindex="0"><table><thead><tr><th scope="col">금융기관</th><th scope="col">권역</th><th scope="col">대표 상품명</th><th scope="col">기본금리</th><th scope="col">최고우대금리</th><th scope="col">주요 우대 조건</th></tr></thead><tbody><tr><td>OK저축은행</td><td>저축은행</td><td>OK e-정기예금</td><td>4.00%</td><td class="rate">4.00%</td><td class="conditions">인터넷·모바일 전용; 별도 우대조건 없음</td></tr><tr><td>SBI저축은행</td><td>저축은행</td><td>정기예금(1년 변동금리)</td><td>3.70%</td><td class="rate">3.90%</td><td class="conditions">공시상 우대폭 0.20%p; 비대면 가입 및 변동주기 관련 세부 조건 재확인 필요</td></tr><tr><td>신협(수지신협)</td><td>상호금융</td><td>정기예탁금</td><td>3.70%</td><td class="rate">3.70%</td><td class="conditions">별도 우대조건 없음; 수지신협 2026-09-09 금리표 기준</td></tr><tr><td>KB국민은행</td><td>시중은행</td><td>KB Star 정기예금</td><td>2.40%</td><td class="rate">3.20%</td><td class="conditions">인터넷·KB스타뱅킹 전용; 최고금리는 가입 시점 고객 적용이율 기준; 별도 거래실적 조건 공시 없음</td></tr><tr><td>수협(대포수협)</td><td>상호금융</td><td>정기예탁금</td><td>3.00%</td><td class="rate">3.00%</td><td class="conditions">별도 우대조건 없음; 대포수협 2026-09-02 금리표 기준</td></tr><tr><td>신한은행</td><td>시중은행</td><td>쏠편한 정기예금</td><td>2.55%</td><td class="rate">2.55%</td><td class="conditions">별도 우대조건 없음; 가입 시점 고시금리 적용; 2026-09-03 인상 반영</td></tr></tbody></table></div></section>
 <footer>기존 조사표의 저장값을 그대로 표시합니다. 신협·수협은 개별 조합 기준이며, 가입 조건과 변동금리 여부를 함께 확인하세요. 이 파일에는 DB 접속 키가 포함되어 있지 않습니다.</footer>
-</main></body></html>
+</main>
+<script>
+"use strict";
+const api="https://bank-rates-monitor.synnexedu-4534.chatgpt.site/api/rates";
+const link=document.querySelector("header a"),button=document.createElement("button");
+button.textContent="새로고침 ↻";button.style.cssText="background:#123d64;color:white;padding:12px 18px;border:0;border-radius:8px;font:inherit;cursor:pointer";link.replaceWith(button);
+const status=document.querySelector("main > .note");status.setAttribute("role","status");status.setAttribute("aria-live","polite");
+document.querySelector("footer").textContent="Supabase에 저장된 조사값을 조회합니다. 웹 금리를 자동 재조사하지 않습니다. 신협·수협은 개별 조합 기준이며 가입 조건과 변동금리 여부를 함께 확인하세요.";
+const money=n=>Number(n).toFixed(2),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let last="",busy=false;
+function render(rows){
+ rows.sort((a,b)=>Number(b.max_rate)-Number(a.max_rate));
+ const top=rows[0],low=rows[rows.length-1],cards=document.querySelectorAll(".card"),cap=Math.max(5,...rows.map(r=>Number(r.max_rate)));
+ const values=[rows.length,top?money(top.max_rate):"—",low?money(low.max_rate):"—",top?money(top.max_rate-low.max_rate):"—"];
+ cards.forEach((c,i)=>{c.querySelector("strong").innerHTML=values[i]+'<small>'+["개","%","%","%p"][i]+"</small>";});
+ cards[0].querySelector("span").textContent="비교 대상 금융기관 "+new Set(rows.map(r=>r.institution_name)).size+"곳";
+ cards[1].querySelector("span").textContent=top?.institution_name??"데이터 없음";cards[2].querySelector("span").textContent=low?.institution_name??"데이터 없음";
+ document.querySelector(".charts").innerHTML=rows.length?rows.map(r=>'<div class="chart"><div class="bank">'+esc(r.institution_name)+'<small>'+esc(r.sector)+'</small></div><div class="bars">'+[["base",r.base_rate],["max",r.max_rate]].map(([cl,n])=>'<div class="track"><div class="bar '+cl+'" style="width:'+Number(n)/cap*100+'%"></div><b>'+money(n)+'%</b></div>').join("")+'</div></div>').join(""):"저장된 데이터가 없습니다.";
+ document.querySelector(".panel .note").textContent="모든 막대는 0~"+money(cap)+"%의 동일 척도입니다. 최고우대금리는 우대를 포함한 총금리입니다.";
+ document.querySelector("thead tr").innerHTML=["금융기관","권역","대표 상품명","기본금리","최고우대금리","주요 우대 조건","기준일"].map(h=>'<th scope="col">'+h+"</th>").join("");
+ document.querySelector("tbody").innerHTML=rows.map(r=>"<tr><td>"+esc(r.institution_name)+"</td><td>"+esc(r.sector)+"</td><td>"+esc(r.product_name)+"</td><td>"+money(r.base_rate)+'%</td><td class="rate">'+money(r.max_rate)+'%</td><td class="conditions">'+esc(r.preferential_conditions)+"</td><td>"+esc(r.as_of_date)+"</td></tr>").join("");
+}
+async function refresh(){
+ if(busy)return;busy=true;button.disabled=true;button.textContent="조회 중…";status.textContent="최신 DB 데이터를 조회하고 있습니다.";
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+ try{
+ const response=await fetch(api,{mode:"cors",credentials:"omit",cache:"no-store",signal:controller.signal});
+ if(!response.ok)throw Error("HTTP "+response.status);
+ const rows=await response.json();
+ if(!Array.isArray(rows)||rows.some(r=>!r||!Number.isFinite(Number(r.base_rate))||!Number.isFinite(Number(r.max_rate))||Number(r.base_rate)<0||Number(r.max_rate)<0))throw Error("응답 형식 오류");
+ render(rows);last=new Date().toLocaleString("ko-KR",{timeZone:"Asia/Seoul"});
+ status.textContent="조회 완료 · "+rows.length+"건 · "+last+" (한국시간)";
+ }catch(e){status.textContent="조회하지 못했습니다. 인터넷 연결을 확인하고 다시 새로고침해 주세요. "+(last?"현재 화면은 "+last+" 조회 결과입니다.":"현재 화면은 2026-09-10 기준 파일에 포함된 데이터입니다.");}
+ finally{clearTimeout(timer);busy=false;button.disabled=false;button.textContent="새로고침 ↻";}
+}
+button.addEventListener("click",refresh);
+refresh();
+</script></body></html>
